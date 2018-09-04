@@ -46,12 +46,12 @@ if [[ -n "$PLUGIN_REBUILD" && "$PLUGIN_REBUILD" == "true" ]]; then
         if [ -d "$source" ]; then
             echo "Rebuilding cache for folder $source..."
             mkdir -p "/cache/$CACHE_PATH/$source" && \
-                rsync -aHA --delete "$source/" "/cache/$CACHE_PATH/$source"
+                rsync -aHA "$source/" "/cache/$CACHE_PATH/$source"
         elif [ -f "$source" ]; then
             echo "Rebuilding cache for file $source..."
             source_dir=$(dirname $source)
             mkdir -p "/cache/$CACHE_PATH/$source_dir" && \
-                rsync -aHA --delete "$source" "/cache/$CACHE_PATH/$source_dir/"
+                rsync -aHA "$source" "/cache/$CACHE_PATH/$source_dir/"
         else
             echo "$source does not exist, removing from cached folder..."
             rm -rf "/cache/$CACHE_PATH/$source"

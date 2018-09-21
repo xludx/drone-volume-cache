@@ -39,8 +39,20 @@ if [[ -e ".cache_key" ]]; then
     fi
 fi
 
+cache_lock_file="/cache/$CACHE_PATH.cachelock"
+timeout_sec="${PLUGIN_TIMEOUT:-300}"
+
+wait_for_lock() {
+    timeout -t $timeout_sec /usr/local/wait_for_lock.sh "$cache_lock_file"
+}
+
 IFS=','; read -ra SOURCES <<< "$PLUGIN_MOUNT"
 if [[ -n "$PLUGIN_REBUILD" && "$PLUGIN_REBUILD" == "true" ]]; then
+    if ! wait_for_lock; then
+        echo 'error: cache destination is locked'
+        exit 1
+    fi
+
     # Create cache
     for source in "${SOURCES[@]}"; do
         if [ -d "$source" ]; then
@@ -58,6 +70,11 @@ if [[ -n "$PLUGIN_REBUILD" && "$PLUGIN_REBUILD" == "true" ]]; then
         fi
     done
 elif [[ -n "$PLUGIN_RESTORE" && "$PLUGIN_RESTORE" == "true" ]]; then
+    if ! wait_for_lock; then
+        echo 'error: cache destination is locked'
+        exit 1
+    fi
+
     # Clear existing cache if asked in commit message
     if [[ $DRONE_COMMIT_MESSAGE == *"[CLEAR CACHE]"* ]]; then
         if [ -d "/cache/$CACHE_PATH" ]; then
@@ -78,6 +95,10 @@ elif [[ -n "$PLUGIN_RESTORE" && "$PLUGIN_RESTORE" == "true" ]]; then
             echo "Invalid value for ttl, please enter a positive integer. Plugin will ignore ttl."
         fi
     fi
+
+    touch "$cache_lock_file"
+    trap "rm '$cache_lock_file'" 1 2 3 15 EXIT
+
     # Restore from cache
     for source in "${SOURCES[@]}"; do
         if [ -d "/cache/$CACHE_PATH/$source" ]; then

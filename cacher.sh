@@ -53,6 +53,9 @@ if [[ -n "$PLUGIN_REBUILD" && "$PLUGIN_REBUILD" == "true" ]]; then
         exit 1
     fi
 
+    touch "$cache_lock_file"
+    trap "rm '$cache_lock_file'" 1 2 3 15 EXIT
+
     # Create cache
     for source in "${SOURCES[@]}"; do
         if [ -d "$source" ]; then
@@ -95,9 +98,6 @@ elif [[ -n "$PLUGIN_RESTORE" && "$PLUGIN_RESTORE" == "true" ]]; then
             echo "Invalid value for ttl, please enter a positive integer. Plugin will ignore ttl."
         fi
     fi
-
-    touch "$cache_lock_file"
-    trap "rm '$cache_lock_file'" 1 2 3 15 EXIT
 
     # Restore from cache
     for source in "${SOURCES[@]}"; do

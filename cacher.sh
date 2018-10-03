@@ -54,7 +54,7 @@ if [[ -n "$PLUGIN_REBUILD" && "$PLUGIN_REBUILD" == "true" ]]; then
     fi
 
     touch "$cache_lock_file"
-    trap "rm '$cache_lock_file'" 1 2 3 15 EXIT
+    trap "rm -f '$cache_lock_file'" 1 2 3 15 EXIT
 
     # Create cache
     for source in "${SOURCES[@]}"; do

@@ -53,6 +53,7 @@ if [[ -n "$PLUGIN_REBUILD" && "$PLUGIN_REBUILD" == "true" ]]; then
         exit 1
     fi
 
+    mkdir -p "$(dirname "$cache_lock_file")"
     touch "$cache_lock_file"
     trap "rm -f '$cache_lock_file'" 0
 

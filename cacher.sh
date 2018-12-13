@@ -12,6 +12,8 @@ if [[ $DRONE_COMMIT_MESSAGE == *"[NO CACHE]"* ]]; then
 fi
 
 CACHE_PATH="$DRONE_REPO_NAMESPACE/$DRONE_REPO_NAME/$DRONE_BUILD_NUMBER"
+echo "CACHE_PATH: ${CACHE_PATH}"
+
 if [[ -n "$PLUGIN_CACHE_KEY" ]]; then
     function join_by { local IFS="$1"; shift; echo "$*"; }
     IFS=','; read -ra CACHE_PATH_VARS <<< "$PLUGIN_CACHE_KEY"

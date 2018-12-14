@@ -1,6 +1,11 @@
 #!/bin/bash
 set -e
 
+if [ ! -d "/cache" ]; then
+    mkdir -p "/cache"
+    echo "Created missing /cache folder"
+fi
+
 if [ -z "$PLUGIN_MOUNT" ]; then
     echo "Specify folders to cache in the mount property! Plugin won't do anything!"
     exit 0
@@ -11,7 +16,7 @@ if [[ $DRONE_COMMIT_MESSAGE == *"[NO CACHE]"* ]]; then
     exit 0
 fi
 
-CACHE_PATH="$DRONE_REPO_NAMESPACE/$DRONE_REPO_NAME/$DRONE_BUILD_NUMBER"
+CACHE_PATH="$DRONE_REPO/$DRONE_BUILD_NUMBER"
 echo "CACHE_PATH: ${CACHE_PATH}"
 
 if [[ -n "$PLUGIN_CACHE_KEY" ]]; then
@@ -89,6 +94,7 @@ elif [[ -n "$PLUGIN_RESTORE" && "$PLUGIN_RESTORE" == "true" ]]; then
             exit 0
         fi
     fi
+
     # Remove files older than TTL
     if [[ -n "$PLUGIN_TTL" && "$PLUGIN_TTL" > "0" ]]; then
         if [[ $PLUGIN_TTL =~ ^[0-9]+$ ]]; then
